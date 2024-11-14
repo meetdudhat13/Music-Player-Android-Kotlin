@@ -8,8 +8,8 @@ object Home
 @Serializable
 object Playlist
 
-//@Serializable
-//object Genres
+@Serializable
+object Player
 
 @Serializable
 object Artists

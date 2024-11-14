@@ -1,9 +1,10 @@
-@file:OptIn(ExperimentalMaterial3Api::class)
-
 package meet.anayacoders.ringtoneapp.presentation.views.drawerScreens
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -24,8 +25,10 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
@@ -33,6 +36,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.media3.exoplayer.ExoPlayer
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -43,12 +48,25 @@ import meet.anayacoders.ringtoneapp.presentation.routes.Album
 import meet.anayacoders.ringtoneapp.presentation.routes.Artists
 import meet.anayacoders.ringtoneapp.presentation.routes.Downloads
 import meet.anayacoders.ringtoneapp.presentation.routes.Home
+import meet.anayacoders.ringtoneapp.presentation.routes.Player
 import meet.anayacoders.ringtoneapp.presentation.routes.Playlist
 import meet.anayacoders.ringtoneapp.presentation.routes.Settings
+import meet.anayacoders.ringtoneapp.ui.home.HomeEvent
+import meet.anayacoders.ringtoneapp.ui.home.HomeScreen
+import meet.anayacoders.ringtoneapp.ui.home.HomeViewModel
+import meet.anayacoders.ringtoneapp.ui.home.component.HomeBottomBar
+import meet.anayacoders.ringtoneapp.ui.playerscreen.PlayerScreen
+import meet.anayacoders.ringtoneapp.ui.playerscreen.SongEvent
+import meet.anayacoders.ringtoneapp.ui.playerscreen.SongViewModel
+import meet.anayacoders.ringtoneapp.ui.playlist.PlaylistViewModel
+import meet.anayacoders.ringtoneapp.ui.viewmodel.SharedViewModel
+import javax.inject.Inject
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainScreen(
-    navController: NavHostController
+    navController: NavHostController,
+    sharedViewModel: SharedViewModel,
 ) {
     val drawerItemsLibrary = listOf(
         NavigationDrawerItem(
@@ -101,6 +119,9 @@ fun MainScreen(
         var selectedItemIndex by rememberSaveable {
             mutableIntStateOf(0)
         }
+
+        val musicControllerUiState = sharedViewModel.musicControllerUiState
+
         ModalNavigationDrawer(
             drawerContent = {
                 ModalDrawerSheet {
@@ -194,19 +215,85 @@ fun MainScreen(
             }) { pd ->
                 NavHost(navController = navController, startDestination = Home) {
                     composable<Home> {
-                        HomeScreen(modifier = Modifier.padding(pd))
+                        val homeViewModel: HomeViewModel = hiltViewModel()
+                        val isInitialized = rememberSaveable { mutableStateOf(false) }
+
+                        if (!isInitialized.value) {
+                            LaunchedEffect(key1 = Unit) {
+                                homeViewModel.onEvent(HomeEvent.FetchSong)
+                                isInitialized.value = true
+                            }
+                        }
+
+                        Column(
+                            modifier = Modifier.fillMaxSize().padding(pd),
+                        ) {
+                            Box(
+                                modifier = Modifier.weight(1f).fillMaxWidth()
+                            ) {
+                                HomeScreen(
+                                    onEvent = homeViewModel::onEvent,
+                                    uiState = homeViewModel.homeUiState,
+                                    modifier = Modifier
+                                )
+                            }
+
+                            HomeBottomBar(
+                                onEvent = homeViewModel::onEvent,
+                                song = musicControllerUiState.currentSong,
+                                playerState = musicControllerUiState.playerState,
+                                onBarClick = { navController.navigate(Player) }
+                            )
+                        }
+
                     }
                     composable<Playlist> {
-                        PlaylistScreen(modifier = Modifier.padding(pd))
+
+                        val playlistViewModel: PlaylistViewModel = hiltViewModel()
+                        PlaylistScreen(modifier = Modifier.padding(pd), viewModel = playlistViewModel)
+
                     }
-//                    composable<Genres> {
-//                        GenresScreen(modifier = Modifier.padding(pd))
-//                    }
+                    composable<Player> {
+
+                        val songViewModel: SongViewModel = hiltViewModel()
+
+
+                        PlayerScreen(modifier = Modifier.padding(pd),
+                            onEvent = songViewModel::onEvent,
+                            musicControllerUiState = musicControllerUiState,
+                            onNavigateUp = {
+                                navController.navigateUp()
+                            },
+                        )
+                    }
                     composable<Artists> {
-                        ArtistsScreen(modifier = Modifier.padding(pd))
+                        val homeViewModel: HomeViewModel = hiltViewModel()
+                        val isInitialized = rememberSaveable { mutableStateOf(false) }
+
+                        if (!isInitialized.value) {
+                            LaunchedEffect(key1 = Unit) {
+                                homeViewModel.onEvent(HomeEvent.FetchSong)
+                                isInitialized.value = true
+                            }
+                        }
+                        ArtistsScreen(modifier = Modifier.padding(pd),
+                            onEvent = homeViewModel::onEvent,
+                            uiState = homeViewModel.homeUiState
+                        )
                     }
                     composable<Album> {
-                        AlbumScreen(modifier = Modifier.padding(pd))
+                        val homeViewModel: HomeViewModel = hiltViewModel()
+                        val isInitialized = rememberSaveable { mutableStateOf(false) }
+
+                        if (!isInitialized.value) {
+                            LaunchedEffect(key1 = Unit) {
+                                homeViewModel.onEvent(HomeEvent.FetchSong)
+                                isInitialized.value = true
+                            }
+                        }
+                        AlbumScreen(modifier = Modifier.padding(pd),
+                            onEvent = homeViewModel::onEvent,
+                            uiState = homeViewModel.homeUiState)
                     }
                     composable<Downloads> {
                         DownloadScreen(modifier = Modifier.padding(pd))

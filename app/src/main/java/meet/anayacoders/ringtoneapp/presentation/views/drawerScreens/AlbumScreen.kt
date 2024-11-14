@@ -1,64 +1,115 @@
 package meet.anayacoders.ringtoneapp.presentation.views.drawerScreens
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.example.ui.theme.msdAlbumSongName
-import meet.anayacoders.ringtoneapp.R
+import coil.compose.AsyncImage
+import meet.anayacoders.ringtoneapp.ui.theme.msdAlbumSongName
+import meet.anayacoders.ringtoneapp.domain.model.Song
+import meet.anayacoders.ringtoneapp.ui.home.HomeEvent
+import meet.anayacoders.ringtoneapp.ui.home.HomeUiState
 
 @Composable
-@Preview
-fun AlbumScreen(modifier: Modifier = Modifier) {
-    LazyVerticalGrid(
-        columns = GridCells.Fixed(2),
-        modifier = Modifier,
-        horizontalArrangement = Arrangement.SpaceEvenly,
-        contentPadding = PaddingValues(8.dp)
-    ) {
-        items(10) {
-            AlbumItem()
+fun AlbumScreen(
+    modifier: Modifier = Modifier,
+    onEvent: (HomeEvent) -> Unit,
+    uiState: HomeUiState
+) {
+
+    with(uiState) {
+        when {
+            loading == true -> {
+                Box(modifier = Modifier.fillMaxSize()) {
+                    CircularProgressIndicator()
+                }
+
+            }
+
+            loading == false && errorMessage == null -> {
+                LazyVerticalGrid(
+                    columns = GridCells.Fixed(2),
+                    modifier = modifier,
+                    horizontalArrangement = Arrangement.SpaceEvenly,
+                    contentPadding = PaddingValues(8.dp)
+                ) {
+                    if (songs != null) {
+                        val song = songs.groupBy { it.album }
+
+                        song.forEach { (album, songs) ->
+                            item {
+//                                AsyncImage(
+//                                    model = album,
+//                                    contentDescription = "",
+//                                    modifier = Modifier.fillMaxWidth(),
+//                                    contentScale = ContentScale.Crop
+//                                )
+//                            }
+//                            items(songs) {
+                                AlbumItem(album = album, song = songs)
+                            }
+                        }
+                    }
+                }
+            }
+
         }
     }
 }
 
 @Composable
-fun AlbumItem(modifier: Modifier = Modifier) {
+fun AlbumItem(modifier: Modifier = Modifier, song: List<Song>, album: String) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier.padding(8.dp)
+        modifier = Modifier
+            .padding(12.dp)
+//            .background(Color.Cyan)
     ) {
-        Image(
-            modifier = Modifier,
-            painter = painterResource(id = R.drawable.demo), contentDescription = ""
+
+
+        AsyncImage(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(120.dp)
+                .clip(RoundedCornerShape(8.dp)),
+            contentScale = ContentScale.Crop,
+            model = song[0].albumArtUri,
+            contentDescription = ""
         )
         Text(
-            text = "Album name aef aue gf aeugf irufha eirh aeiruh sdfg dfg a eri",
+            text = song[0].album,
             maxLines = 2,
             color = Color.White,
             style = msdAlbumSongName,
             overflow = TextOverflow.Ellipsis,
-            modifier = Modifier.padding(vertical = 8.dp)
+            modifier = Modifier
+                .align(Alignment.Start)
+                .padding(vertical = 8.dp)
         )
         Row(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Text(
-                text = "Unknown Artist",
+                text = song[0].artist,
                 color = Color.Gray,
                 modifier = Modifier.weight(1f),
                 maxLines = 1,
@@ -66,11 +117,12 @@ fun AlbumItem(modifier: Modifier = Modifier) {
                 overflow = TextOverflow.Ellipsis
             )
             Text(
-                text = "1:46:56",
+                text = "${song.size} songs",
                 color = Color.Gray,
                 style = msdAlbumSongName
             )
         }
 
     }
+
 }
