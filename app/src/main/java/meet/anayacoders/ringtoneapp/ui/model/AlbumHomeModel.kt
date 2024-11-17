@@ -1,4 +1,4 @@
-package meet.anayacoders.ringtoneapp.presentation.model
+package meet.anayacoders.ringtoneapp.ui.model
 
 data class AlbumHomeModel(
     val albumName : String,

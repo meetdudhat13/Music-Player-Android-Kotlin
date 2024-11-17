@@ -1,4 +1,4 @@
-package meet.anayacoders.ringtoneapp.presentation.views.drawerScreens
+package meet.anayacoders.ringtoneapp.ui.artist
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background

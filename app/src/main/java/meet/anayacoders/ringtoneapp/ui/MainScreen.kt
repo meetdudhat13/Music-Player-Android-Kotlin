@@ -1,4 +1,4 @@
-package meet.anayacoders.ringtoneapp.presentation.views.drawerScreens
+package meet.anayacoders.ringtoneapp.ui
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
@@ -29,6 +29,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
@@ -37,30 +38,24 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.media3.exoplayer.ExoPlayer
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import kotlinx.coroutines.launch
 import meet.anayacoders.ringtoneapp.R
-import meet.anayacoders.ringtoneapp.presentation.model.NavigationDrawerItem
-import meet.anayacoders.ringtoneapp.presentation.routes.Album
-import meet.anayacoders.ringtoneapp.presentation.routes.Artists
-import meet.anayacoders.ringtoneapp.presentation.routes.Downloads
-import meet.anayacoders.ringtoneapp.presentation.routes.Home
-import meet.anayacoders.ringtoneapp.presentation.routes.Player
-import meet.anayacoders.ringtoneapp.presentation.routes.Playlist
-import meet.anayacoders.ringtoneapp.presentation.routes.Settings
+import meet.anayacoders.ringtoneapp.ui.model.NavigationDrawerItem
+import meet.anayacoders.ringtoneapp.ui.routes.Screen
+import meet.anayacoders.ringtoneapp.ui.album.AlbumScreen
+import meet.anayacoders.ringtoneapp.ui.artist.ArtistsScreen
 import meet.anayacoders.ringtoneapp.ui.home.HomeEvent
 import meet.anayacoders.ringtoneapp.ui.home.HomeScreen
 import meet.anayacoders.ringtoneapp.ui.home.HomeViewModel
 import meet.anayacoders.ringtoneapp.ui.home.component.HomeBottomBar
 import meet.anayacoders.ringtoneapp.ui.playerscreen.PlayerScreen
-import meet.anayacoders.ringtoneapp.ui.playerscreen.SongEvent
 import meet.anayacoders.ringtoneapp.ui.playerscreen.SongViewModel
+import meet.anayacoders.ringtoneapp.ui.playlist.PlaylistScreen
 import meet.anayacoders.ringtoneapp.ui.playlist.PlaylistViewModel
 import meet.anayacoders.ringtoneapp.ui.viewmodel.SharedViewModel
-import javax.inject.Inject
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -68,6 +63,12 @@ fun MainScreen(
     navController: NavHostController,
     sharedViewModel: SharedViewModel,
 ) {
+    val currentRoute = remember { mutableStateOf("Home") } // Default route is 'home'
+
+    navController.addOnDestinationChangedListener { _, destination, _ ->
+        currentRoute.value = destination.route ?: "Home"
+    }
+
     val drawerItemsLibrary = listOf(
         NavigationDrawerItem(
             title = "Home",
@@ -94,21 +95,7 @@ fun MainScreen(
             selectedIcon = painterResource(id = R.drawable.ic_album),
             unselectedIcon = painterResource(id = R.drawable.ic_album_outlined)
         ),
-        NavigationDrawerItem(
-            title = "Downloads",
-            selectedIcon = painterResource(id = R.drawable.ic_download),
-            unselectedIcon = painterResource(id = R.drawable.ic_download)
-        ),
-        NavigationDrawerItem(
-            title = "Settings",
-            selectedIcon = painterResource(id = R.drawable.ic_settings),
-            unselectedIcon = painterResource(id = R.drawable.ic_settings_outlined)
-        ),
-        NavigationDrawerItem(
-            title = "Help & Feedback",
-            selectedIcon = painterResource(id = R.drawable.ic_help),
-            unselectedIcon = painterResource(id = R.drawable.ic_help_outlined)
-        ),
+
     )
 
     Surface(
@@ -146,34 +133,23 @@ fun MainScreen(
                                 selectedItemIndex = index
                                 when (item.title) {
                                     "Home" -> {
-                                        navController.navigate(Home)
+                                        navController.navigate(Screen.Home.route)
                                     }
 
                                     "Playlist" -> {
-                                        navController.navigate(Playlist)
+                                        navController.navigate(Screen.Playlist.route)
                                     }
-//                                    "Genres" -> {
-//                                        navController.navigate(Genres)
-//                                    }
 
                                     "Artists" -> {
-                                        navController.navigate(Artists)
+                                        navController.navigate(Screen.Artists.route)
                                     }
 
                                     "Album" -> {
-                                        navController.navigate(Album)
-                                    }
-
-                                    "Downloads" -> {
-                                        navController.navigate(Downloads)
-                                    }
-
-                                    "Settings" -> {
-                                        navController.navigate(Settings)
+                                        navController.navigate(Screen.Album.route)
                                     }
 
                                     else -> {
-                                        navController.navigate(Home)
+                                        navController.navigate(Screen.Home.route)
                                     }
                                 }
                                 scope.launch {
@@ -203,20 +179,27 @@ fun MainScreen(
             drawerState = drawerState,
         ) {
             Scaffold(topBar = {
-                TopAppBar(title = { Text("Music Player") }, navigationIcon = {
-                    IconButton(onClick = {
-                        scope.launch {
-                            drawerState.open()
+                if (currentRoute.value != Screen.Player.route) {
+                    TopAppBar(title = { Text("Music Player") }, navigationIcon = {
+                        IconButton(onClick = {
+                            scope.launch {
+                                drawerState.open()
+                            }
+                        }) {
+                            Icon(Icons.Default.Menu, contentDescription = "")
                         }
-                    }) {
-                        Icon(Icons.Default.Menu, contentDescription = "")
-                    }
-                })
+                    })
+                }
             }) { pd ->
-                NavHost(navController = navController, startDestination = Home) {
-                    composable<Home> {
-                        val homeViewModel: HomeViewModel = hiltViewModel()
-                        val isInitialized = rememberSaveable { mutableStateOf(false) }
+
+                val homeViewModel: HomeViewModel = hiltViewModel()
+                val isInitialized = rememberSaveable { mutableStateOf(false) }
+
+                NavHost(navController = navController, startDestination = Screen.Home.route) {
+
+                    composable(Screen.Home.route) {
+//                        val homeViewModel: HomeViewModel = hiltViewModel()
+//                        val isInitialized = rememberSaveable { mutableStateOf(false) }
 
                         if (!isInitialized.value) {
                             LaunchedEffect(key1 = Unit) {
@@ -226,10 +209,14 @@ fun MainScreen(
                         }
 
                         Column(
-                            modifier = Modifier.fillMaxSize().padding(pd),
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .padding(pd),
                         ) {
                             Box(
-                                modifier = Modifier.weight(1f).fillMaxWidth()
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .fillMaxWidth()
                             ) {
                                 HomeScreen(
                                     onEvent = homeViewModel::onEvent,
@@ -242,23 +229,50 @@ fun MainScreen(
                                 onEvent = homeViewModel::onEvent,
                                 song = musicControllerUiState.currentSong,
                                 playerState = musicControllerUiState.playerState,
-                                onBarClick = { navController.navigate(Player) }
+                                onBarClick = { navController.navigate(Screen.Player.route) }
                             )
                         }
 
                     }
-                    composable<Playlist> {
+                    composable(Screen.Playlist.route) {
 
                         val playlistViewModel: PlaylistViewModel = hiltViewModel()
-                        PlaylistScreen(modifier = Modifier.padding(pd), viewModel = playlistViewModel)
+
+                        Column(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .padding(pd),
+                        ) {
+                            Box(
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .fillMaxWidth()
+                            ) {
+                                PlaylistScreen(
+                                    modifier = Modifier,
+                                    viewModel = playlistViewModel
+                                )
+                            }
+
+                            HomeBottomBar(
+                                onEvent = homeViewModel::onEvent,
+                                song = musicControllerUiState.currentSong,
+                                playerState = musicControllerUiState.playerState,
+                                onBarClick = { navController.navigate(Screen.Player.route) }
+                            )
+                        }
+
+
+
 
                     }
-                    composable<Player> {
+                    composable(Screen.Player.route) {
 
                         val songViewModel: SongViewModel = hiltViewModel()
 
 
-                        PlayerScreen(modifier = Modifier.padding(pd),
+                        PlayerScreen(
+                            modifier = Modifier.padding(pd),
                             onEvent = songViewModel::onEvent,
                             musicControllerUiState = musicControllerUiState,
                             onNavigateUp = {
@@ -266,44 +280,82 @@ fun MainScreen(
                             },
                         )
                     }
-                    composable<Artists> {
-                        val homeViewModel: HomeViewModel = hiltViewModel()
-                        val isInitialized = rememberSaveable { mutableStateOf(false) }
-
+                    composable(Screen.Artists.route) {
+//                        val homeViewModel: HomeViewModel = hiltViewModel()
+//                        val isInitialized = rememberSaveable { mutableStateOf(false) }
+//
                         if (!isInitialized.value) {
                             LaunchedEffect(key1 = Unit) {
                                 homeViewModel.onEvent(HomeEvent.FetchSong)
                                 isInitialized.value = true
                             }
                         }
-                        ArtistsScreen(modifier = Modifier.padding(pd),
-                            onEvent = homeViewModel::onEvent,
-                            uiState = homeViewModel.homeUiState
-                        )
-                    }
-                    composable<Album> {
-                        val homeViewModel: HomeViewModel = hiltViewModel()
-                        val isInitialized = rememberSaveable { mutableStateOf(false) }
 
+                        Column(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .padding(pd),
+                        ) {
+                            Box(
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .fillMaxWidth()
+                            ) {
+                                ArtistsScreen(
+                                    onEvent = homeViewModel::onEvent,
+                                    uiState = homeViewModel.homeUiState
+                                )
+                            }
+
+                            HomeBottomBar(
+                                onEvent = homeViewModel::onEvent,
+                                song = musicControllerUiState.currentSong,
+                                playerState = musicControllerUiState.playerState,
+                                onBarClick = { navController.navigate(Screen.Player.route) }
+                            )
+                        }
+
+
+                    }
+                    composable(Screen.Album.route){
+//                        val homeViewModel: HomeViewModel = hiltViewModel()
+//                        val isInitialized = rememberSaveable { mutableStateOf(false) }
+//
                         if (!isInitialized.value) {
                             LaunchedEffect(key1 = Unit) {
                                 homeViewModel.onEvent(HomeEvent.FetchSong)
                                 isInitialized.value = true
                             }
                         }
-                        AlbumScreen(modifier = Modifier.padding(pd),
-                            onEvent = homeViewModel::onEvent,
-                            uiState = homeViewModel.homeUiState)
-                    }
-                    composable<Downloads> {
-                        DownloadScreen(modifier = Modifier.padding(pd))
-                    }
-                    composable<Settings> {
-                        SettingScreen(modifier = Modifier.padding(pd))
+//
+                        Column(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .padding(pd),
+                        ) {
+                            Box(
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .fillMaxWidth()
+                            ) {
+
+                                AlbumScreen(
+                                    onEvent = homeViewModel::onEvent,
+                                    uiState = homeViewModel.homeUiState
+                                )
+                            }
+
+                            HomeBottomBar(
+                                onEvent = homeViewModel::onEvent,
+                                song = musicControllerUiState.currentSong,
+                                playerState = musicControllerUiState.playerState,
+                                onBarClick = { navController.navigate(Screen.Player.route) }
+                            )
+                        }
+
                     }
 
                 }
-
             }
         }
     }

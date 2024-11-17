@@ -1,4 +1,4 @@
-package meet.anayacoders.ringtoneapp.presentation.views.drawerScreens
+package meet.anayacoders.ringtoneapp.ui.playlist
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
@@ -42,7 +42,6 @@ import meet.anayacoders.ringtoneapp.ui.theme.msdLabelViewAll
 import meet.anayacoders.ringtoneapp.ui.theme.msdSongSingerName
 import meet.anayacoders.ringtoneapp.R
 import meet.anayacoders.ringtoneapp.data.local.entity.PlaylistEntity
-import meet.anayacoders.ringtoneapp.ui.playlist.PlaylistViewModel
 
 @Composable
 fun PlaylistScreen(modifier: Modifier = Modifier, viewModel: PlaylistViewModel) {

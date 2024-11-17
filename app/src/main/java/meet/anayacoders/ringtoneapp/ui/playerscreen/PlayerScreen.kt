@@ -1,13 +1,15 @@
 package meet.anayacoders.ringtoneapp.ui.playerscreen
 
-import android.media.audiofx.Visualizer
-import android.util.Log
 import androidx.annotation.DrawableRes
-import androidx.annotation.OptIn
-import androidx.compose.animation.core.LinearEasing
-import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -17,13 +19,11 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -31,11 +31,9 @@ import androidx.compose.material.icons.automirrored.rounded.KeyboardArrowLeft
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Slider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -43,11 +41,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
@@ -58,10 +57,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.media3.common.C
-import androidx.media3.common.MediaItem
-import androidx.media3.common.util.UnstableApi
-import androidx.media3.exoplayer.ExoPlayer
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import meet.anayacoders.ringtoneapp.R
@@ -100,19 +95,6 @@ fun PlayerScreenBody(
 ) {
     val context = LocalContext.current
 
-    // Create ExoPlayer instance
-//    val exoPlayer = remember {
-//        ExoPlayer.Builder(context).build().apply {
-//            val mediaItem = MediaItem.fromUri(song.data)
-//            setMediaItem(mediaItem)
-//            prepare()
-//            playWhenReady = musicControllerUiState.playerState == PlayerState.PLAYING
-//        }
-//    }
-
-    // Dispose ExoPlayer when the composable is removed
-
-    // Observe the playback state and update when it changes
     val isPlaying =
         remember { mutableStateOf(musicControllerUiState.playerState == PlayerState.PLAYING) }
 
@@ -155,63 +137,9 @@ fun PlayerScreenBody(
 
         )
 
-        // Add SoundBarsVisualizer
-//        SoundBarsVisualizer(
-//            player = exoPlayer,
-//            modifier = Modifier
-//                .fillMaxWidth()
-//                .height(100.dp)
-//                .align(Alignment.BottomCenter)
-//                .padding(16.dp)
-//        )
     }
 }
 
-//@Composable
-//fun PlayerScreenBody(
-//    song: Song,
-//    onEvent: (SongEvent) -> Unit,
-//    musicControllerUiState: MusicControllerUiState,
-//    onNavigateUp: () -> Unit,
-//) {
-//    val context = LocalContext.current
-//
-//    val imagePainter = rememberAsyncImagePainter(
-//        model = ImageRequest.Builder(context).data(song.albumArtUri).crossfade(true).build()
-//    )
-//    val iconResId =
-//        if (musicControllerUiState.playerState == PlayerState.PLAYING) R.drawable.ic_player_pause else R.drawable.ic_player_play
-//
-//
-//    Box(modifier = Modifier.fillMaxSize()) {
-//        PlayerScreenContent(
-//            song = song,
-//            isSongPlaying = musicControllerUiState.playerState == PlayerState.PLAYING,
-//            imagePainter = imagePainter,
-//            dominantColor = Color.White,
-//            currentTime = musicControllerUiState.currentPosition,
-//            totalTime = musicControllerUiState.totalDuration,
-//            playPauseIcon = iconResId,
-//            playOrToggleSong = {
-//                onEvent(if (musicControllerUiState.playerState == PlayerState.PLAYING) SongEvent.PauseSong else SongEvent.ResumeSong)
-//            },
-//            playNextSong = {
-//                onEvent(SongEvent.SkipToNextSong)
-//            },
-//            playPreviousSong = {
-//                onEvent(SongEvent.SkipToPreviousSong)
-//            },
-//            onSliderChange = { newPosition ->
-//                onEvent(SongEvent.SeekSongToPosition(newPosition.toLong()))
-//            },
-//            onClose = {
-//                onNavigateUp()
-//            }
-//
-//        )
-//    }
-//
-//}
 
 @Composable
 fun PlayerScreenContent(
@@ -236,7 +164,7 @@ fun PlayerScreenContent(
 
         Spacer(modifier = Modifier.height(32.dp))
         Image(
-            painter = imagePainter,
+            painter = if (song.albumArtUri!="") imagePainter else painterResource(id = R.drawable.demo),
             contentDescription = "",
             modifier = Modifier.height(LocalConfiguration.current.screenHeightDp.dp / 1.6f),
             contentScale = ContentScale.Crop,
@@ -330,7 +258,7 @@ fun PlayerScreenContent(
                 contentDescription = ""
             )
             Spacer(modifier = Modifier.height(16.dp))
-            Text(text = "${currentTime.toTime()}/${totalTime.toTime()}", color = Color.White)
+            Text(text = "${currentTime.toTime()} / ${totalTime.toTime()}", color = Color.White)
             Spacer(modifier = Modifier.height(16.dp))
             Row(
                 horizontalArrangement = Arrangement.spacedBy(16.dp),
@@ -382,92 +310,74 @@ fun PlayerScreenContent(
                 Slider(
                     value = currentTime.toFloat(),
                     onValueChange = onSliderChange,
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp),
                     valueRange = 0f..totalTime.toFloat(),
                 )
 
                 Spacer(modifier = Modifier.height(32.dp))
-                Text(
-                    text = "Sound bar with beat syncing",
-                    color = Color.White,
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier.fillMaxWidth()
-                )
+
+                AnimatedVisibility(
+                    visible = isSongPlaying,
+                    enter = fadeIn(animationSpec = tween(500)),
+                    exit = fadeOut(animationSpec = tween(500))
+                ) {
+                    Box(modifier = Modifier.fillMaxWidth()) {
+                        MovingWave(frequency = 24, waveColor = Color.White)
+                        MovingWave(frequency = 24, initialOffset = 3f, waveColor = Color.Cyan)
+                    }
+                }
             }
         }
     }
+
 }
 
 
-@OptIn(UnstableApi::class)
 @Composable
-fun SoundBarsVisualizer(player: ExoPlayer, modifier: Modifier = Modifier) {
-    // State to hold the waveform data
-    val waveformData = remember { mutableStateOf(List(20) { 0 }) }
+fun MovingWave(
+    waveColor: Color = Color.Blue,       // Wave color
+    speed: Int = 1600,                  // Speed of one cycle (in milliseconds)
+    thickness: Float = 5f,              // Thickness of the wave line
+    frequency: Int = 12,                // Number of oscillations across the width
+    amplitude: Float = 100f,            // Amplitude (height) of the wave
+    initialOffset: Float = 0f           // Initial phase offset for the wave
+) {
+    val infiniteTransition = rememberInfiniteTransition(label = "")
 
-    LaunchedEffect(player) {
-        val audioSessionId = player.audioSessionId
-        if (audioSessionId != C.AUDIO_SESSION_ID_UNSET) {
-            try {
-                val visualizer = Visualizer(audioSessionId).apply {
-                    captureSize = Visualizer.getCaptureSizeRange()[1]
-                    setDataCaptureListener(
-                        object : Visualizer.OnDataCaptureListener {
-                            override fun onWaveFormDataCapture(
-                                visualizer: Visualizer,
-                                waveform: ByteArray,
-                                samplingRate: Int
-                            ) {
-                                // Divide the waveform into 20 segments
-                                val segmentSize = waveform.size / 20
-                                val heights = (0 until 20).map { i ->
-                                    val segment =
-                                        waveform.slice(i * segmentSize until (i + 1) * segmentSize)
-                                    segment.map { byte -> (byte.toInt() + 128) * 100 / 256 }
-                                        .average().toInt()
-                                }
-                                waveformData.value = heights
-                            }
+    val animatedOffset by infiniteTransition.animateFloat(
+        initialValue = initialOffset, // Start from the given initial offset
+        targetValue = initialOffset + 2f * Math.PI.toFloat(), // Complete one full sine wave cycle
+        animationSpec = infiniteRepeatable(
+            animation = tween(speed, easing = { it }) // Linear easing for smooth motion
+        ),
+        label = ""
+    )
 
-                            override fun onFftDataCapture(
-                                visualizer: Visualizer,
-                                fft: ByteArray,
-                                samplingRate: Int
-                            ) {
-                                // Optional: Handle FFT data if needed
-                            }
-                        },
-                        Visualizer.getMaxCaptureRate() / 2,
-                        true,
-                        false
-                    )
-                    enabled = true
-                }
+    Canvas(modifier = Modifier.fillMaxSize()) {
+        val waveWidth = size.width
+        val waveHeight = size.height / 2
 
-//                onDispose {
-//                    visualizer.release()
-//                }
-            } catch (e: RuntimeException) {
-                Log.e("Visualizer", "Visualizer initialization failed", e)
+        val wavePath = Path().apply {
+            var x = 0f
+            val startY =
+                waveHeight + amplitude * kotlin.math.sin(animatedOffset) // Calculate the initial Y position
+            moveTo(x, startY)
+
+            x += 10f
+            while (x <= waveWidth) {
+                val y =
+                    waveHeight + amplitude * kotlin.math.sin(frequency * x / waveWidth + animatedOffset)
+                lineTo(x, y)
+                x += 10f
             }
         }
-    }
 
-    // Draw the 20 sound bars using the processed waveform data
-    Row(
-        modifier = modifier
-            .fillMaxWidth()
-            .rotate(180f)
-            .padding(16.dp),
-        horizontalArrangement = Arrangement.SpaceEvenly
-    ) {
-        waveformData.value.forEach { height ->
-            Box(
-                modifier = Modifier
-                    .width(8.dp)
-                    .height(height.dp)
-                    .background(MaterialTheme.colorScheme.onPrimaryContainer)
-            )
-        }
+        drawPath(
+            path = wavePath,
+            color = waveColor,
+            style = Stroke(width = thickness)
+        )
     }
 }

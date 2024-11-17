@@ -6,6 +6,7 @@ import androidx.compose.runtime.Immutable
 data class Song (
     val id: Long,
     val title: String,
+    val hasAlbumImg : Boolean,
     val artist: String,
     val album: String,
     val duration: Long, // Duration in milliseconds

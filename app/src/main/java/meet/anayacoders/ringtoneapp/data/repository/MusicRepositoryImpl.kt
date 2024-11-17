@@ -2,6 +2,7 @@ package meet.anayacoders.ringtoneapp.data.repository
 
 import android.content.ContentUris
 import android.content.Context
+import android.media.MediaMetadataRetriever
 import android.net.Uri
 import android.provider.MediaStore
 import kotlinx.coroutines.flow.Flow
@@ -76,15 +77,19 @@ class MusicRepositoryImpl @Inject constructor(
                         albumId
                     ).toString()
 
+                    val hasAlbumArt = hasAlbumArt(data)
+
+
                     val audioFile = SongDto(
                         id = id,
                         title = title,
                         artist = artist,
+                        hasAlbumImg = hasAlbumArt,
                         album = album,
                         duration = duration,
                         data = data,
                         albumId = albumId,
-                        albumArtUri = albumArtUri,
+                        albumArtUri = if (hasAlbumArt) albumArtUri else "",
                         displayName = displayName,
                         size = size,
                         dateAdded = dateAdded
@@ -97,4 +102,16 @@ class MusicRepositoryImpl @Inject constructor(
                 emit(Resource.Success(audioList.map { it.toSong() }))
             }
         }
+}
+fun hasAlbumArt(songPath: String): Boolean {
+    val retriever = MediaMetadataRetriever()
+    return try {
+        retriever.setDataSource(songPath)
+        val albumArt = retriever.embeddedPicture
+        albumArt != null // Returns true if album art exists
+    } catch (e: Exception) {
+        false // In case of any error
+    } finally {
+        retriever.release()
+    }
 }

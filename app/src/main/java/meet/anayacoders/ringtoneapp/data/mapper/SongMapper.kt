@@ -10,6 +10,7 @@ fun SongDto.toSong() =
     Song(
         id = id,
         title = title,
+        hasAlbumImg = hasAlbumImg,
         artist = artist,
         album = album,
         duration = duration,
@@ -23,10 +24,13 @@ fun SongDto.toSong() =
 
 
 @OptIn(UnstableApi::class)
-fun MediaItem.toSong() =
-    Song(
+fun MediaItem.toSong() : Song{
+    val hasAlbumImg = mediaMetadata.artworkUri != null
+
+    return   Song(
         id = mediaId.toLongOrNull() ?: 0L, // Convert mediaId to Long, default to 0 if parsing fails
         title = mediaMetadata.title.toString(),
+        hasAlbumImg = hasAlbumImg,
         artist = mediaMetadata.artist.toString(),
         album = mediaMetadata.albumTitle.toString(),
         duration = mediaMetadata.durationMs ?: 0L,
@@ -37,3 +41,4 @@ fun MediaItem.toSong() =
         size = 0L, // Size is not available from MediaItem directly, set to 0 or fetch separately if needed
         dateAdded = 0L // Date added is also not available, set to 0 or fetch separately if needed
     )
+}

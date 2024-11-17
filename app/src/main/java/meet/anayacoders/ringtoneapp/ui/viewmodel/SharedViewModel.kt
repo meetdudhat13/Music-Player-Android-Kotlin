@@ -26,6 +26,10 @@ class SharedViewModel @Inject constructor(
     var musicControllerUiState by mutableStateOf(MusicControllerUiState())
         private set
 
+    var showAppBar by mutableStateOf(true)
+        private set
+
+
     init {
         setMediaControllerCallback()
     }
@@ -56,6 +60,14 @@ class SharedViewModel @Inject constructor(
 
     fun destroyMediaController() {
         destroyMediaControllerUseCase()
+    }
+
+    fun onNavigateToPlayerScreen() {
+        showAppBar = false
+    }
+
+    fun onNavigateBackToHome() {
+        showAppBar = true
     }
 
 }

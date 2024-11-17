@@ -1,4 +1,4 @@
-package meet.anayacoders.ringtoneapp.presentation.model
+package meet.anayacoders.ringtoneapp.ui.model
 
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.ImageVector

@@ -4,6 +4,7 @@ data class SongDto(
     val id: Long,
     val title: String,
     val artist: String,
+    val hasAlbumImg : Boolean,
     val album: String,
     val duration: Long, // Duration in milliseconds
     val data: String, // File path to the audio file

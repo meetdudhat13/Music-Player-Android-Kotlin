@@ -32,12 +32,12 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import coil.compose.rememberAsyncImagePainter
-import meet.anayacoders.ringtoneapp.ui.theme.msdLabelViewAll
-import meet.anayacoders.ringtoneapp.ui.theme.msdSongSingerName
 import meet.anayacoders.ringtoneapp.R
 import meet.anayacoders.ringtoneapp.domain.model.Song
 import meet.anayacoders.ringtoneapp.other.PlayerState
 import meet.anayacoders.ringtoneapp.ui.home.HomeEvent
+import meet.anayacoders.ringtoneapp.ui.theme.msdLabelViewAll
+import meet.anayacoders.ringtoneapp.ui.theme.msdSongSingerName
 
 //@Composable
 //fun HomeBottomBar(
@@ -274,7 +274,9 @@ fun HomeBottomBarItem(
             modifier = Modifier.fillMaxWidth()
         ) {
             Image(
-                painter = rememberAsyncImagePainter(song.albumArtUri),
+                painter = if (song.albumArtUri != "") rememberAsyncImagePainter(song.albumArtUri) else painterResource(
+                    id = R.drawable.demo
+                ),
                 contentDescription = song.title,
                 contentScale = ContentScale.Crop,
                 modifier = Modifier

@@ -1,4 +1,4 @@
-package meet.anayacoders.ringtoneapp.presentation.views.drawerScreens
+package meet.anayacoders.ringtoneapp.ui.album
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -23,10 +23,11 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
-import meet.anayacoders.ringtoneapp.ui.theme.msdAlbumSongName
+import meet.anayacoders.ringtoneapp.R
 import meet.anayacoders.ringtoneapp.domain.model.Song
 import meet.anayacoders.ringtoneapp.ui.home.HomeEvent
 import meet.anayacoders.ringtoneapp.ui.home.HomeUiState
+import meet.anayacoders.ringtoneapp.ui.theme.msdAlbumSongName
 
 @Composable
 fun AlbumScreen(
@@ -56,14 +57,6 @@ fun AlbumScreen(
 
                         song.forEach { (album, songs) ->
                             item {
-//                                AsyncImage(
-//                                    model = album,
-//                                    contentDescription = "",
-//                                    modifier = Modifier.fillMaxWidth(),
-//                                    contentScale = ContentScale.Crop
-//                                )
-//                            }
-//                            items(songs) {
                                 AlbumItem(album = album, song = songs)
                             }
                         }
@@ -81,19 +74,35 @@ fun AlbumItem(modifier: Modifier = Modifier, song: List<Song>, album: String) {
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier
             .padding(12.dp)
-//            .background(Color.Cyan)
     ) {
 
 
-        AsyncImage(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(120.dp)
-                .clip(RoundedCornerShape(8.dp)),
-            contentScale = ContentScale.Crop,
-            model = song[0].albumArtUri,
-            contentDescription = ""
-        )
+        if (song[0].hasAlbumImg) {
+            AsyncImage(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(120.dp)
+                    .clip(RoundedCornerShape(8.dp)),
+                contentScale = ContentScale.Crop,
+                model = song[0].albumArtUri,
+                contentDescription = ""
+            )
+        }else{
+            AsyncImage(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(120.dp)
+                    .clip(RoundedCornerShape(8.dp)),
+                contentScale = ContentScale.Crop,
+
+                //TODO: Replace with album image
+
+                model = R.drawable.demo,
+                contentDescription = ""
+            )
+        }
+
+
         Text(
             text = song[0].album,
             maxLines = 2,

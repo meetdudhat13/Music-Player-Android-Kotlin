@@ -10,7 +10,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.compose.AppTheme
 import dagger.hilt.android.AndroidEntryPoint
 import meet.anayacoders.ringtoneapp.data.service.MusicService
-import meet.anayacoders.ringtoneapp.presentation.views.drawerScreens.MainScreen
+import meet.anayacoders.ringtoneapp.ui.MainScreen
 import meet.anayacoders.ringtoneapp.ui.viewmodel.SharedViewModel
 
 @AndroidEntryPoint
