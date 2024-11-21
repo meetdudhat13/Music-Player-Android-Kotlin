@@ -8,10 +8,9 @@ import com.google.common.util.concurrent.Futures
 import com.google.common.util.concurrent.ListenableFuture
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
-
 @AndroidEntryPoint
-class MusicService : MediaSessionService(){
-    private var mediaSession : MediaSession? = null
+class MusicService : MediaSessionService() {
+    private var mediaSession: MediaSession? = null
 
     @Inject
     lateinit var exoPlayer: ExoPlayer
@@ -29,18 +28,20 @@ class MusicService : MediaSessionService(){
     override fun onDestroy() {
         mediaSession?.run {
             exoPlayer.release()
+            release()
             mediaSession = null
         }
+
         super.onDestroy()
     }
 
-    private inner class MediaSessionCallback: MediaSession.Callback{
+    private inner class MediaSessionCallback : MediaSession.Callback {
         override fun onAddMediaItems(
             mediaSession: MediaSession,
             controller: MediaSession.ControllerInfo,
             mediaItems: MutableList<MediaItem>
         ): ListenableFuture<MutableList<MediaItem>> {
-            val updatedMediaItems = mediaItems.map{
+            val updatedMediaItems = mediaItems.map {
                 it.buildUpon().setUri(it.mediaId).build()
             }.toMutableList()
 

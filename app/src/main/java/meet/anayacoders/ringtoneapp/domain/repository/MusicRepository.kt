@@ -6,4 +6,6 @@ import meet.anayacoders.ringtoneapp.other.Resource
 
 interface MusicRepository {
     fun getSongs(): Flow<Resource<List<Song>>>
+
+//    fun getSongsByArtist():Flow<Resource<List<Song>>>
 }

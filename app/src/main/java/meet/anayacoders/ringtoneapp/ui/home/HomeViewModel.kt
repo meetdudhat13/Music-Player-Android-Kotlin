@@ -31,18 +31,24 @@ class HomeViewModel @Inject constructor(
     var homeUiState by mutableStateOf(HomeUiState())
         private set
 
+
+
     fun onEvent(event: HomeEvent) {
         when (event) {
             HomeEvent.PlaySong -> playSong()
             HomeEvent.PauseSong -> pauseSong()
             HomeEvent.ResumeSong -> resumeSong()
-            HomeEvent.FetchSong -> getSong()
+            HomeEvent.FetchAllSong -> getSong()
 
             is HomeEvent.OnSongSelected -> homeUiState =
                 homeUiState.copy(selectedSong = event.selectedSong)
 
+            is HomeEvent.OnArtistClick -> getSongByArtist(event.artist)
+            is HomeEvent.OnAlbumSelected -> getSongByAlbum(event.album)
+
             is HomeEvent.SkipToNextSong -> skipToNextSong()
             is HomeEvent.SkipToPreviousSong -> skipToPreviousSong()
+
         }
     }
 
@@ -86,11 +92,18 @@ class HomeViewModel @Inject constructor(
         }
     }
 
+    private fun getSongByArtist( artist: String){
+        homeUiState.selectedFilter = homeUiState.songs?.filter { it.artist == artist }
+    }
+
+    private fun getSongByAlbum( album: String){
+        homeUiState.selectedFilter = homeUiState.songs?.filter { it.album == album }
+    }
+
     private fun playSong() {
         homeUiState.apply {
             songs?.indexOf(selectedSong)?.let { song ->
                 playSongUseCase(song)
-
             }
         }
     }

@@ -11,7 +11,6 @@ import dagger.hilt.android.components.ServiceComponent
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.android.scopes.ServiceScoped
 import javax.inject.Singleton
-
 @Module
 @InstallIn(ServiceComponent::class)
 object ServiceModule {
@@ -22,9 +21,6 @@ object ServiceModule {
         .setContentType(C.AUDIO_CONTENT_TYPE_MUSIC)
         .setUsage(C.USAGE_MEDIA)
         .build()
-
-
-
 
     @ServiceScoped
     @Provides

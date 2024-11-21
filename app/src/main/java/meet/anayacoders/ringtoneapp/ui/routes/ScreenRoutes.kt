@@ -28,6 +28,7 @@ sealed class Screen(val route: String) {
     object Playlist : Screen("playlist")
     object Artists : Screen("artists")
     object Album : Screen("album")
-    object Downloads : Screen("downloads")
-    object Settings : Screen("settings")
+    object CategorizedSong : Screen("downloads")
+//    object Settings : Screen("settings")
+
 }

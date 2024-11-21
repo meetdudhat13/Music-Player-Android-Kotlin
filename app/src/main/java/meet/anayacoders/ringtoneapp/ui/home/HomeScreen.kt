@@ -3,7 +3,6 @@ package meet.anayacoders.ringtoneapp.ui.home
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -16,14 +15,11 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.wrapContentHeight
-import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -31,7 +27,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.focus.focusModifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
@@ -56,124 +51,122 @@ import meet.anayacoders.ringtoneapp.ui.theme.msdSongSingerName
 
 @Composable
 fun HomeScreen(modifier: Modifier = Modifier, onEvent: (HomeEvent) -> Unit, uiState: HomeUiState) {
-//    LazyColumn(
-    Column(
+    LazyColumn(
+//    Column(
         modifier = Modifier
-            .verticalScroll(rememberScrollState())
+//            .verticalScroll(rememberScrollState())
             .fillMaxSize(),
     ) {
-//        item {
-        Row(
-            modifier = Modifier
-                .horizontalScroll(rememberScrollState())
-                .padding(horizontal = 8.dp),
+        item {
+            Row(
+                modifier = Modifier
+                    .horizontalScroll(rememberScrollState())
+                    .padding(horizontal = 8.dp),
 
 
+                ) {
+                //            albumList.forEach { item ->
+                AlbumItemHomeScreen()
+                AlbumItemHomeScreen()
+                AlbumItemHomeScreen()
+                AlbumItemHomeScreen()
+                //            }
+            }
+        }
+        item {
+
+            Row(
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp)
             ) {
-            //            albumList.forEach { item ->
-            AlbumItemHomeScreen()
-            AlbumItemHomeScreen()
-            AlbumItemHomeScreen()
-            AlbumItemHomeScreen()
-            //            }
+                Text(text = "Top genres", style = msdLabelHeading)
+                Text(text = "VIEW ALL", style = msdLabelViewAll, color = labelViewAllGrayColor)
+            }
         }
-//        }
-//        item {
+        item {
 
-        Row(
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp)
-        ) {
-            Text(text = "Top genres", style = msdLabelHeading)
-            Text(text = "VIEW ALL", style = msdLabelViewAll, color = labelViewAllGrayColor)
+
+            Row(
+                modifier = Modifier
+                    .horizontalScroll(rememberScrollState())
+                    .padding(horizontal = 8.dp),
+
+
+                ) {
+                //            albumList.forEach { item ->
+                GenresItemHomeScreen()
+                GenresItemHomeScreen()
+                GenresItemHomeScreen()
+                GenresItemHomeScreen()
+                GenresItemHomeScreen()
+                //            }
+            }
         }
-//        }
-//        item {
+        item {
 
-
-        Row(
-            modifier = Modifier
-                .horizontalScroll(rememberScrollState())
-                .padding(horizontal = 8.dp),
-
-
+            Row(
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp)
             ) {
-            //            albumList.forEach { item ->
-            GenresItemHomeScreen()
-            GenresItemHomeScreen()
-            GenresItemHomeScreen()
-            GenresItemHomeScreen()
-            GenresItemHomeScreen()
-            //            }
+                Text(text = "Trending", style = msdLabelHeading)
+                Text(text = "VIEW ALL", style = msdLabelViewAll, color = labelViewAllGrayColor)
+            }
         }
-//        }
-//        item {
-
-        Row(
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp)
-        ) {
-            Text(text = "Trending", style = msdLabelHeading)
-            Text(text = "VIEW ALL", style = msdLabelViewAll, color = labelViewAllGrayColor)
-        }
-//        }
 
 
         with(uiState) {
             when {
                 loading == true -> {
-//                    item {
+                    item {
 
-                    Box(modifier = Modifier.fillMaxSize()) {
-                        CircularProgressIndicator(
-                            color = MaterialTheme.colorScheme.onBackground,
-                            modifier = Modifier
-                                .size(100.dp)
-                                .fillMaxHeight()
-                                .align(Alignment.Center)
-                                .padding(
-                                    top = 16.dp, start = 16.dp, end = 16.dp, bottom = 16.dp
-                                )
-                        )
+                        Box(modifier = Modifier.fillMaxSize()) {
+                            CircularProgressIndicator(
+                                color = MaterialTheme.colorScheme.onBackground,
+                                modifier = Modifier
+                                    .size(100.dp)
+                                    .fillMaxHeight()
+                                    .align(Alignment.Center)
+                                    .padding(
+                                        top = 16.dp, start = 16.dp, end = 16.dp, bottom = 16.dp
+                                    )
+                            )
+                        }
                     }
-                }
 
-//                }
+                }
 
                 loading == false && errorMessage == null -> {
                     if (songs != null) {
-
 //                        items(songs) {
-                        LazyColumn(
-                            modifier = Modifier.height(88.dp * (songs.size)),
-                            userScrollEnabled = false
-                        ) {
-                            items(songs) {
-                                SongItemHomeScreen(
-                                    song = it,
-                                    playerState = uiState.selectedSong == it,
-                                ) {
-                                    onEvent(HomeEvent.OnSongSelected(it))
-                                    onEvent(HomeEvent.PlaySong)
-                                }
+//                        LazyColumn(
+//                            modifier = Modifier.height(500.dp),
+//                            userScrollEnabled = false
+//                        ) {
+                        items(songs) {
+                            SongItemHomeScreen(
+                                song = it,
+                                playerState = uiState.selectedSong == it,
+                            ) {
+                                onEvent(HomeEvent.OnSongSelected(it))
+                                onEvent(HomeEvent.PlaySong)
                             }
-
                         }
                     }
-//                    }
                 }
 
                 errorMessage != null -> {}
             }
+//        }
         }
     }
 }
+//}
 
 @Composable
 fun AlbumItemHomeScreen(modifier: Modifier = Modifier) {
@@ -316,7 +309,7 @@ fun SongItemHomeScreen(
                     modifier = Modifier.size(72.dp),
                     contentScale = ContentScale.Crop,
                     model = song.albumArtUri,
-                    contentDescription = ""
+                    contentDescription = " "
                 )
             } else {
                 AsyncImage(

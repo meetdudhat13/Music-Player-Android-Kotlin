@@ -61,13 +61,4 @@ class SharedViewModel @Inject constructor(
     fun destroyMediaController() {
         destroyMediaControllerUseCase()
     }
-
-    fun onNavigateToPlayerScreen() {
-        showAppBar = false
-    }
-
-    fun onNavigateBackToHome() {
-        showAppBar = true
-    }
-
 }

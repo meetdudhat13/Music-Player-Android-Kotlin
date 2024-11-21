@@ -1,5 +1,6 @@
 package meet.anayacoders.ringtoneapp.ui.album
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -33,7 +34,8 @@ import meet.anayacoders.ringtoneapp.ui.theme.msdAlbumSongName
 fun AlbumScreen(
     modifier: Modifier = Modifier,
     onEvent: (HomeEvent) -> Unit,
-    uiState: HomeUiState
+    uiState: HomeUiState,
+    onClick: (String) -> Unit
 ) {
 
     with(uiState) {
@@ -54,10 +56,12 @@ fun AlbumScreen(
                 ) {
                     if (songs != null) {
                         val song = songs.groupBy { it.album }
-
                         song.forEach { (album, songs) ->
                             item {
-                                AlbumItem(album = album, song = songs)
+                                AlbumItem(album = album, song = songs){
+                                    onEvent(HomeEvent.OnAlbumSelected(it))
+                                    onClick(it)
+                                }
                             }
                         }
                     }
@@ -69,11 +73,19 @@ fun AlbumScreen(
 }
 
 @Composable
-fun AlbumItem(modifier: Modifier = Modifier, song: List<Song>, album: String) {
+fun AlbumItem(
+    modifier: Modifier = Modifier,
+    song: List<Song>,
+    album: String,
+    onClick: (String) -> Unit
+) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier
             .padding(12.dp)
+            .clickable {
+                onClick(album)
+            }
     ) {
 
 
@@ -85,9 +97,9 @@ fun AlbumItem(modifier: Modifier = Modifier, song: List<Song>, album: String) {
                     .clip(RoundedCornerShape(8.dp)),
                 contentScale = ContentScale.Crop,
                 model = song[0].albumArtUri,
-                contentDescription = ""
+                contentDescription = " "
             )
-        }else{
+        } else {
             AsyncImage(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -104,7 +116,7 @@ fun AlbumItem(modifier: Modifier = Modifier, song: List<Song>, album: String) {
 
 
         Text(
-            text = song[0].album,
+            text = album,
             maxLines = 2,
             color = Color.White,
             style = msdAlbumSongName,

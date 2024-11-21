@@ -324,14 +324,13 @@ fun PlayerScreenContent(
                     exit = fadeOut(animationSpec = tween(500))
                 ) {
                     Box(modifier = Modifier.fillMaxWidth()) {
-                        MovingWave(frequency = 24, waveColor = Color.White)
-                        MovingWave(frequency = 24, initialOffset = 3f, waveColor = Color.Cyan)
+                        MovingWave(frequency = 24, waveColor = Color.White, amplitude = 50f)
+                        MovingWave(frequency = 24, initialOffset = 3f, waveColor = Color.Cyan, amplitude = 50f)
                     }
                 }
             }
         }
     }
-
 }
 
 

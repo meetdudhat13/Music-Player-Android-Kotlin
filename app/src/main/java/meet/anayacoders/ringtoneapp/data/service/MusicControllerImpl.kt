@@ -20,7 +20,6 @@ import meet.anayacoders.ringtoneapp.other.PlayerState
 class MusicControllerImpl(context: Context) : MusicController {
 
     private var mediaControllerFuture: ListenableFuture<MediaController>
-
     private val mediaController: MediaController?
         get() = if (mediaControllerFuture.isDone) mediaControllerFuture.get() else null
 

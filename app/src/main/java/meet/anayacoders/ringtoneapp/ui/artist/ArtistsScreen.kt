@@ -35,7 +35,8 @@ import meet.anayacoders.ringtoneapp.ui.home.HomeUiState
 fun ArtistsScreen(
     modifier: Modifier = Modifier,
     onEvent: (HomeEvent) -> Unit,
-    uiState: HomeUiState
+    uiState: HomeUiState,
+    onNavigate: () -> Unit
 ) {
 
     with(uiState) {
@@ -58,6 +59,8 @@ fun ArtistsScreen(
                         song.forEach { (artist, songs) ->
                             item {
                                 ArtistItem(songs = songs, artist = artist) {
+                                    onEvent(HomeEvent.OnArtistClick(it))
+                                    onNavigate()
                                 }
                             }
                         }
@@ -78,12 +81,12 @@ fun ArtistItem(
     modifier: Modifier = Modifier,
     songs: List<Song>,
     artist: String,
-    onClick: () -> Unit
+    onClick: (String) -> Unit
 ) {
     Row(
         modifier = Modifier
             .clickable {
-                onClick()
+                onClick(artist)
             }
             .padding(horizontal = 16.dp, vertical = 8.dp)
             .fillMaxWidth(),
